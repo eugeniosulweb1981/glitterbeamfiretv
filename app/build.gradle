@@ -1,0 +1,52 @@
+apply plugin: 'com.android.application'
+
+android { 
+    namespace 'uk.co.glitterbeam.firetv'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "uk.co.glitterbeam.firetv"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "STREAM_URL", "\"http://maggie.torontocast.com:9020/stream\""
+        buildConfigField "String", "LOGO_URL", "\"https://glitterbeam.co.uk/Logo_Horizontal.png\""
+        buildConfigField "String", "TICKER_URL", "\"https://glitterbeam.co.uk/firetv/ticker.json\""
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            debuggable true
+        }
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    packagingOptions {
+        resources {
+            excludes += ['META-INF/*']
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.leanback:leanback:1.8.1'
+
+    // ExoPlayer for audio playback
+    implementation 'com.google.android.exoplayer:exoplayer:2.19.1'
+
+    // Glide for loading the logo from URL
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
+}
