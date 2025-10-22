@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,21 +22,35 @@ jobs:
       - name: Install Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Accept licenses and install build tools
+      - name: Accept licenses & install build tools
         run: |
           yes | sdkmanager --licenses
           sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+
+      - name: Verify project files
+        run: |
+          pwd
+          ls -la
+          echo "----- app module -----"
+          ls -la app
+          echo "----- src/main -----"
+          ls -la app/src/main || true
 
       - name: Download Gradle 8.6
         run: |
           curl -L https://services.gradle.org/distributions/gradle-8.6-bin.zip -o gradle.zip
           unzip -q gradle.zip
+          chmod +x gradle-8.6/bin/gradle
           ./gradle-8.6/bin/gradle --version
 
-      - name: Build Debug APK
-        run: ./gradle-8.6/bin/gradle assembleDebug
+      - name: Build Debug APK (verbose)
+        env:
+          ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
+        run: |
+          ./gradle-8.6/bin/gradle --no-daemon --stacktrace --info assembleDebug
 
       - name: Upload APK artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: glitterbeam-firetv-apk
