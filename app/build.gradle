@@ -14,6 +14,8 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // BuildConfig fields we use in MainActivity
         buildConfigField "String", "STREAM_URL", "\"http://maggie.torontocast.com:9020/stream\""
         buildConfigField "String", "LOGO_URL", "\"https://glitterbeam.co.uk/Logo_Horizontal.png\""
         buildConfigField "String", "TICKER_URL", "\"https://glitterbeam.co.uk/firetv/ticker.json\""
@@ -29,8 +31,16 @@ android {
         }
     }
 
+    // ✅ Enable BuildConfig and viewBinding
     buildFeatures {
+        buildConfig true
         viewBinding true
+    }
+
+    // ✅ AGP 8.x expects Java 17
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     packagingOptions {
@@ -39,6 +49,7 @@ android {
         }
     }
 }
+
 
 dependencies {
     implementation 'androidx.core:core-ktx:1.13.1'
