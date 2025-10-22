@@ -1,3 +1,4 @@
+
 package uk.co.glitterbeam.firetv;
 
 import android.graphics.Color;
@@ -24,9 +25,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,23 +48,19 @@ public class MainActivity extends AppCompatActivity {
         Button btnStop = findViewById(R.id.btnStop);
         tickerText = findViewById(R.id.tickerText);
 
-        // Load logo
         Glide.with(this).load(LOGO_URL).into(logoView);
 
-        // Initialize player lazily on first play
         btnPlay.setOnClickListener(v -> play());
         btnPause.setOnClickListener(v -> pause());
         btnStop.setOnClickListener(v -> stop());
 
-        // Ensure marquee runs
         tickerText.setSelected(true);
 
-        // Start periodic ticker refresh
         tickerFetchTask = new Runnable() {
             @Override
             public void run() {
                 fetchAndApplyTicker();
-                handler.postDelayed(this, 5 * 60 * 1000); // every 5 minutes
+                handler.postDelayed(this, 5 * 60 * 1000);
             }
         };
     }
@@ -125,27 +119,31 @@ public class MainActivity extends AppCompatActivity {
                 int code = conn.getResponseCode();
                 if (code == 200) {
                     InputStream is = conn.getInputStream();
-                    String body = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
-                            .lines().collect(Collectors.joining("\n"));
-                    JSONObject json = new JSONObject(body);
-                    List<String> items = new ArrayList<>();
+                    StringBuilder sb = new StringBuilder();
+                    try (BufferedReader br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+                        String line;
+                        while ((line = br.readLine()) != null) sb.append(line).append('
+');
+                    }
+                    JSONObject json = new JSONObject(sb.toString());
+                    StringBuilder combined = new StringBuilder();
                     if (json.has("items")) {
                         JSONArray arr = json.getJSONArray("items");
                         for (int i = 0; i < arr.length(); i++) {
                             String s = arr.optString(i, "").trim();
-                            if (!s.isEmpty()) items.add(s);
+                            if (!s.isEmpty()) {
+                                if (combined.length() > 0) combined.append("    •    ");
+                                combined.append(s);
+                            }
                         }
                     }
-                    int speed = json.optInt("speed", 40);
-                    String textColor = json.optString("textColor", "#FFFFFF");
-                    String bgColor = json.optString("bgColor", "#160016");
+                    final String textColor = json.optString("textColor", "#FFFFFF");
+                    final String bgColor = json.optString("bgColor", "#160016");
 
-                    String combined = String.join("    •    ", items);
                     runOnUiThread(() -> {
-                        if (!combined.isEmpty()) tickerText.setText(combined);
+                        if (combined.length() > 0) tickerText.setText(combined.toString());
                         try { tickerText.setTextColor(Color.parseColor(textColor)); } catch (Exception ignored) {}
                         try { tickerText.setBackgroundColor(Color.parseColor(bgColor)); } catch (Exception ignored) {}
-                        // Note: 'speed' is not directly used by Android marquee; keeping for future custom scroller.
                     });
                 } else {
                     Log.w("Ticker", "HTTP " + code);

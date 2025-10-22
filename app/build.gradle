@@ -1,8 +1,9 @@
+
 plugins {
     id 'com.android.application'
 }
 
-android { 
+android {
     namespace 'uk.co.glitterbeam.firetv'
     compileSdk 34
 
@@ -44,11 +45,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.leanback:leanback:1.8.1'
-
-    // ExoPlayer for audio playback
     implementation 'com.google.android.exoplayer:exoplayer:2.19.1'
-
-    // Glide for loading the logo from URL
     implementation 'com.github.bumptech.glide:glide:4.16.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
 }
