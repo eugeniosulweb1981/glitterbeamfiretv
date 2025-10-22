@@ -1,4 +1,4 @@
-// Root build.gradle — use plugins DSL, no repositories here
+// Root build.gradle — repositories live in settings.gradle
 plugins {
     id 'com.android.application' version '8.4.2' apply false
 }
